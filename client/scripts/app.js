@@ -37,13 +37,22 @@ app.fetch = function() {
   });
 };
 
-app.clearMessages = function() {};
+app.clearMessages = function() {
+  var messages = Array.from($('#chats').children());
 
-app.renderMessage = function(message) {};
+  for (vals of messages) {
+    vals.remove();
+  }
+};
 
-app.renderRoom = function() {};
+app.renderMessage = function(message) {
+  var {username, text, roomname} = message;
+  $('#chats').append(`<div>${username}: ${text}</div>`);
+};
 
-app.renderMessage = function() {};
+app.renderRoom = function(roomname) {
+  $('#roomSelect').append(`<button class='${roomname}$'>${roomname}</button>`);
+};
 
 var message = {
   username: "shawndrost9",
