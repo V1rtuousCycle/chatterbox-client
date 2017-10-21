@@ -23,11 +23,21 @@ app.send = function(message) {
 app.fetch = function() {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
-    // url: "http://parse.hrr.hackreactor.com/chatterbox/classes/messages",
+    url: "http://parse.hrr.hackreactor.com/chatterbox/classes/messages",
     type: "GET",
     contentType: "application/json",
+    data: "order=-createdAt", //REQUEST FROM NEWEST
     success: function(data) {
       console.log(data);
+      var roomNames = [];
+      for (messages of data.results) {
+        app.renderMessage(messages);
+        // if condition
+        if (roomNames.indexOf(messages.roomname) === -1) {
+          app.renderRoom(messages.roomname);
+        }
+        roomNames.push(messages.roomname);
+      }
     },
     error: function(data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -46,7 +56,9 @@ app.clearMessages = function() {
 
 app.renderMessage = function(message) {
   var { username, text, roomname } = message;
-  $("#chats").append(`<div class='message ${roomname}'>${username}: ${text}</div>`);
+  $("#chats").append(
+    `<div class='message ${roomname}'>${username}: ${text}</div>`
+  );
 };
 
 app.renderRoom = function(roomname) {
@@ -57,42 +69,17 @@ app.handleUsernameClick = function(username) {};
 
 app.handleSubmit = function() {};
 
-var message = {
-  username: "shawndrost9",
-  text: "trololo",
-  roomname: "4chan"
-};
-
-var message2 = {
-  username: "kiwi454",
-  text: "I'm kiwi454",
-  roomname: "NewZealand"
-};
-var message3 = {
-  username: "sublime",
-  text: "I'm Sublime Text",
-  roomname: "Editors"
-};
-
-$(document).ready( function() {
-  app.renderMessage(message);
-  app.renderMessage(message2);
-  app.renderMessage(message3);
-  app.renderRoom('4chan');
-  app.renderRoom('NewZealand');
-  app.renderRoom('Editors');
-
-  $('#roomSelect').on('click', 'button', function() {
-    var room = $(this).attr('class');
-    console.log(room);
-    $('.message').hide();
+$(document).ready(function() {
+  $("#roomSelect").on("click", "button", function() {
+    var room = $(this).attr("class");
+    $(".message").hide();
     $(`.${room}`).show();
-    console.log(`.${room}`);
   });
 
-  $('#createRoom').on('click', function() {
-    var roomName = $('#roomName').val();
+  $("#createRoom").on("click", function() {
+    var roomName = $("#roomName").val();
     app.renderRoom(roomName);
   });
 
+  app.fetch();
 });
