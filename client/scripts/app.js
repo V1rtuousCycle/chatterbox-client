@@ -7,7 +7,7 @@ app.send = function(message) {
     // This is the url you should use to communicate with the parse API server.
     url: "http://parse.hrr.hackreactor.com/chatterbox/classes/messages",
     type: "POST",
-    data: message,
+    data: JSON.stringify(message),
     contentType: "application/json",
     success: function(data) {
       console.log("chatterbox: Message sent");
@@ -30,12 +30,17 @@ app.fetch = function() {
     success: function(data) {
       console.log(data);
       var roomNames = [];
+      var userNames = [];
       for (messages of data.results) {
         app.renderMessage(messages);
         // if condition
         if (roomNames.indexOf(messages.roomname) === -1) {
           app.renderRoom(messages.roomname);
         }
+        if (userNames.indexOf(messages.username) === -1) {
+          app.renderUsers(messages.username);
+        }
+        userNames.push(messages.username);
         roomNames.push(messages.roomname);
       }
     },
@@ -54,26 +59,65 @@ app.clearMessages = function() {
   }
 };
 
+app.renderUsers = function(username) {
+  if (username !== undefined) {
+    username = removeTags(username);
+  }
+  $("#All-User__Sidebar").append(`<p id = '${username}'>${username}</p>`);
+};
+
 app.renderMessage = function(message) {
   var { username, text, roomname } = message;
-  $("#chats").append(
-    `<div class='message ${roomname}'>${username}: ${text}</div>`
-  );
+  if (username === undefined || roomname === undefined || text === undefined) {
+    console.log('no message');
+  } else {
+    if (username !== undefined) {
+      username = removeTags(username);
+    }
+    if (roomname !== undefined) {
+      roomname = removeTags(roomname);
+    }
+    if (text !== undefined) {
+      text = removeTags(text);
+    }
+
+    $("#chats").append(
+      `<div class='message ${roomname}'>${username}: ${text}</div>`
+    );
+  }
 };
 
 app.renderRoom = function(roomname) {
-  $("#roomSelect").append(`<button class='${roomname}'>${roomname}</button>`);
+  if (roomname !== undefined) {
+    roomname = removeTags(roomname);
+    var element = $(`<button class='${roomname}'>${roomname}</button>`);
+    $("#roomSelect").append(element);
+  }
 };
 
 app.handleUsernameClick = function(username) {};
 
-app.handleSubmit = function() {};
+app.handleSubmit = function() {
+  var url = window.location.href;
+  var username = url.split("=")[1];
+  var message = {
+    username: username,
+    text: $("#sendMessage").val(),
+    roomname: $("#chats").attr("class")
+  };
+  app.send(message);
+};
 
 $(document).ready(function() {
   $("#roomSelect").on("click", "button", function() {
     var room = $(this).attr("class");
     $(".message").hide();
     $(`.${room}`).show();
+    $("#chats").attr("class", "").attr("class", `${room}`);
+  });
+
+  $(".homeRoom").on("click", function() {
+    $(".message").show();
   });
 
   $("#createRoom").on("click", function() {
@@ -81,5 +125,38 @@ $(document).ready(function() {
     app.renderRoom(roomName);
   });
 
+  $("#sendMessageButton").on("click", function() {
+    app.handleSubmit();
+  });
+
   app.fetch();
 });
+
+var tagBody = "(?:[^\"'>]|\"[^\"]*\"|'[^']*')*";
+
+var tagOrComment = new RegExp(
+  "<(?:" +
+    // Comment body.
+    "!--(?:(?:-*[^->])*--+|-?)" +
+    // Special "raw text" elements whose content should be elided.
+    "|script\\b" +
+    tagBody +
+    ">[\\s\\S]*?</script\\s*" +
+    "|style\\b" +
+    tagBody +
+    ">[\\s\\S]*?</style\\s*" +
+    // Regular name
+    "|/?[a-z]" +
+    tagBody +
+    ")>",
+  "gi"
+);
+
+var removeTags = function(html) {
+  var oldHtml;
+  do {
+    oldHtml = html;
+    html = html.replace(tagOrComment, "");
+  } while (html !== oldHtml);
+  return html.replace(/</g, "&lt;");
+};

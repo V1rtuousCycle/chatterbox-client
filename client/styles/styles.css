@@ -1,8 +1,13 @@
+html {
+
+}
+
 body {
     background: #eee;
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
+
 }
 
 #main, #chats {
@@ -86,5 +91,18 @@ form input[type=text] {
 .friend {
     color: #fff;
     background-color: #0090da;
+}
+
+#All-User__Sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 25%;
+    background-color: teal;
+/*    border-bottom: 3px solid black;
+    border-right: 3px solid black;*/
+    padding: 10px;
+    overflow: scroll;
 }
 
