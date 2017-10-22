@@ -1,5 +1,6 @@
 var app = {
-  init: function() {}
+  init: function() {},
+  friends: []
 };
 
 app.send = function(message) {
@@ -82,7 +83,7 @@ app.renderMessage = function(message) {
     }
 
     $("#chats").append(
-      `<div class='message ${roomname}'>${username}: ${text}</div>`
+      `<div class='message ${roomname} ${username}'>${username}: ${text}</div>`
     );
   }
 };
@@ -108,6 +109,13 @@ app.handleSubmit = function() {
   app.send(message);
 };
 
+app.addFriends = function(friend) {
+  if (app.friends.indexOf(friend.text()) === -1) {
+    $('#Friends__Sidebar').append(friend);
+    app.friends.push(friend.text());
+  }
+};
+
 $(document).ready(function() {
   $("#roomSelect").on("click", "button", function() {
     var room = $(this).attr("class");
@@ -127,6 +135,14 @@ $(document).ready(function() {
 
   $("#sendMessageButton").on("click", function() {
     app.handleSubmit();
+  });
+
+  $("#All-User__Sidebar").on('click', 'p', function () {
+    var friend = $(this).attr('id');
+    $(this).toggleClass('bolded');
+    $(document).find(`.${friend}`).toggleClass('friend');
+    var userCopy = $(this).clone();
+    app.addFriends(userCopy);
   });
 
   app.fetch();

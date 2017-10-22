@@ -99,10 +99,33 @@ form input[type=text] {
     left: 0;
     height: 100%;
     width: 25%;
-    background-color: teal;
+    background-color: #4F9DB2;
 /*    border-bottom: 3px solid black;
     border-right: 3px solid black;*/
     padding: 10px;
     overflow: scroll;
+    text-align: center;
+}
+
+#All-User__Sidebar p:hover {
+    transform: scale(2);
+    transition: 0.5s;
+}
+
+#Friends__Sidebar {
+    position: absolute;
+    top: 0;
+    left: 75%;
+    height: 100%;
+    width: 25%;
+    background-color: #B25800;
+/*    border-bottom: 3px solid black;
+    border-right: 3px solid black;*/
+    padding: 10px;
+    overflow: scroll;
+    text-align: center;
+}
+.bolded {
+    font-weight: bold;
 }
 
