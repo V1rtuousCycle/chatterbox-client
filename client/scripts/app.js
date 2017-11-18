@@ -33,6 +33,7 @@ app.fetch = function() {
       var roomNames = [];
       var userNames = [];
       for (messages of data.results) {
+        debugger;
         app.renderMessage(messages);
         // if condition
         if (roomNames.indexOf(messages.roomname) === -1) {
